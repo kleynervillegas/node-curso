@@ -5,6 +5,7 @@ import bodyParser from 'body-parser';
 import morgan from 'morgan'
 import cors from 'cors'
 
+const jwt = require("jsonwebtoken");
 const app = express();
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.json({ type: 'application/*+json' }));
@@ -28,6 +29,21 @@ app.set('port', config.port|| 3000);
 app.get('/',(req,res) => {
     res.json({message: "hola"});
 }); 
+
+app.set('jwtSecret', config.jwtSecret); 
+
+const payload = {
+    check:  true,
+    user: {
+        name: 'kleyner villegas',
+        numberid: '20096862',
+    }
+   };
+
+   const token = jwt.sign(payload, app.get('jwtSecret'), {
+    expiresIn: 1440
+   });
+   console.log(token);
 
 app.use('/api/tasks',TasksRoutes);
 
