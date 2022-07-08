@@ -2,8 +2,10 @@ import express from "express";
 import TasksRoutes from './routes/tasks/tasks.routes';
 import config from './config/config';
 import bodyParser from 'body-parser';
-import morgan from 'morgan'
-import cors from 'cors'
+import morgan from 'morgan';
+import cors from 'cors';
+import UsersRoutes from './routes/users/users.router';
+import { authentication } from "./middelware/authentication";
 
 const jwt = require("jsonwebtoken");
 const app = express();
@@ -24,27 +26,30 @@ app.use(cors());
 // parse application/json
 app.use(bodyParser.json());
 
-app.set('port', config.port|| 3000);
+app.set('port', config.port || 3000);
 
-app.get('/',(req,res) => {
-    res.json({message: "hola"});
-}); 
+app.get('/', (req, res) => {
+    res.json({ message: "hola" });
+});
 
-app.set('jwtSecret', config.jwtSecret); 
+app.set('jwtSecret', config.jwtSecret);
 
 const payload = {
-    check:  true,
+    check: true,
     user: {
         name: 'kleyner villegas',
         numberid: '20096862',
     }
-   };
+};
 
-   const token = jwt.sign(payload, app.get('jwtSecret'), {
+const token = jwt.sign(payload, app.get('jwtSecret'), {
     expiresIn: 1440
-   });
-   console.log(token);
+});
+console.log(token);
 
-app.use('/api/tasks',TasksRoutes);
+app.use('/api/tasks', TasksRoutes);
+//user
+app.use('/api/users', authentication, UsersRoutes);
+
 
 export default app;
